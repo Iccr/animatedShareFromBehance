@@ -9,6 +9,38 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
+        <!--Circle View Controller-->
+        <scene sceneID="x7G-df-QJk">
+            <objects>
+                <viewController id="Qky-FR-akf" customClass="CircleViewController" customModule="animatedShareBehance" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="7GY-ws-436">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="azr-w3-2CW">
+                                <rect key="frame" x="67.5" y="213.5" width="240" height="240"/>
+                                <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="240" id="3Hh-or-AIq"/>
+                                    <constraint firstAttribute="height" constant="240" id="7aa-6I-HPW"/>
+                                </constraints>
+                            </view>
+                        </subviews>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+                        <constraints>
+                            <constraint firstItem="azr-w3-2CW" firstAttribute="centerX" secondItem="7GY-ws-436" secondAttribute="centerX" id="Gty-jt-Jot"/>
+                            <constraint firstItem="azr-w3-2CW" firstAttribute="centerY" secondItem="7GY-ws-436" secondAttribute="centerY" id="q0x-iD-BYG"/>
+                        </constraints>
+                        <viewLayoutGuide key="safeArea" id="Gl1-Uw-diZ"/>
+                    </view>
+                    <connections>
+                        <outlet property="screen" destination="azr-w3-2CW" id="gop-Oa-3Ki"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="mdm-vz-gYU" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-706.39999999999998" y="43.628185907046479"/>
+        </scene>
         <!--View Controller-->
         <scene sceneID="tne-QT-ifu">
             <objects>
@@ -32,9 +64,13 @@
                         </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
+                    <connections>
+                        <outlet property="playButton" destination="stX-m0-8IZ" id="3lj-Vz-Waf"/>
+                    </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>
             </objects>
+            <point key="canvasLocation" x="342" y="102"/>
         </scene>
     </scenes>
 </document>

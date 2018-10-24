@@ -9,13 +9,27 @@
 import UIKit
 
 class ViewController: UIViewController {
-    
-    var origin: CGPoint?
 
-    var lineView: UIView?
-    var complementaryLineView: UIView?
-    var circleView: UIView?
-    var innerView: UIView?
+    
+    // middle view
+    var middleLineView: UIView?
+    var middleComplementaryLineView: UIView?
+    var middleCircle: UIView?
+    
+    
+    // left view
+    var leftLineView: UIView?
+    var leftComplementaryLineView: UIView?
+    var leftCircle: UIView?
+    
+    // right view
+    var rightLineView: UIView?
+    var rightComplementaryLineView: UIView?
+    var rightCircle: UIView?
+    
+    
+    
+    @IBOutlet weak var playButton: UIButton!
     
     let cubicTimingParameters = UICubicTimingParameters.init(controlPoint1: CGPoint.init(x:  0.99, y:  0.1), controlPoint2: CGPoint.init(x: 0.99, y: 0.92))
     
@@ -23,118 +37,165 @@ class ViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
-        setupInitialPoint()
         setup()
         animate()
     }
 
 
-    func setupInitialPoint() {
-        let width = self.view.bounds.width * 0.5
-        self.origin = CGPoint.init(x: width, y: 30)
-    }
     
     
     func setup() {
-        guard let origin = self.origin else {return}
-        let rect = CGRect.init(origin: origin, size: CGSize.init(width: 2, height: 20))
-        let lineView = UIView.init(frame: rect)
-        lineView.center = origin
-        self.lineView = lineView
-        lineView.backgroundColor = UIColor.red
+        // left view
+        var width = self.view.bounds.width * 0.25
+        var origin = CGPoint.init(x: width, y: 30)
+        let leftLineView = self.createViewAt(center: origin, isComplementary: false)
+        let leftComplimentaryView = self.createViewAt(center: origin, isComplementary: true)
+        self.leftLineView = leftLineView
+        self.leftComplementaryLineView = leftComplimentaryView
+        self.view.addSubview(leftLineView)
+        self.view.addSubview(leftComplimentaryView)
         
-        let complimentaryView = UIView.init(frame: rect)
-        complimentaryView.center = origin
-        self.complementaryLineView = complimentaryView
-        complimentaryView.backgroundColor = .white
-        self.view.addSubview(complimentaryView)
-        self.view.addSubview(lineView)
+//        middle view
         
+        width = self.view.bounds.width * 0.5
+        origin = CGPoint.init(x: width, y: 30)
+        let middleLineView = self.createViewAt(center: origin, isComplementary: false)
+        let middleComplimentaryView = self.createViewAt(center: origin, isComplementary: true)
+        self.middleLineView = middleLineView
+        self.middleComplementaryLineView = middleComplimentaryView
+        self.view.addSubview(middleLineView)
+        self.view.addSubview(middleComplimentaryView)
+        
+        // right view
+        width = self.view.bounds.width * 0.75
+        origin = CGPoint.init(x: width, y: 30)
+        let rightLineView = self.createViewAt(center: origin, isComplementary: false)
+        let rightComplimentaryView = self.createViewAt(center: origin, isComplementary: true)
+        self.rightLineView = rightLineView
+        self.rightComplementaryLineView = rightComplimentaryView
+        self.view.addSubview(rightLineView)
+        self.view.addSubview(rightComplimentaryView)
+        
+        
+    }
+    
+    func createViewAt(center: CGPoint, isComplementary: Bool) -> UIView {
+        let rect = CGRect.init(origin: center, size: CGSize.init(width: 2, height: 20))
+        let view = UIView.init(frame: rect)
+        view.center = center
+        view.backgroundColor = isComplementary ? .white : .red
+        return view
     }
     
     @IBAction func play(_ sender: UIButton) {
-        self.complementaryLineView?.removeFromSuperview()
-        self.lineView?.removeFromSuperview()
-        self.circleView?.removeFromSuperview()
-
-        setupInitialPoint()
+        dispose()
         setup()
         animate()
+    }
+    
+    func dispose() {
+        // left view
+        self.leftComplementaryLineView?.removeFromSuperview()
+        self.leftLineView?.removeFromSuperview()
+        self.leftCircle?.removeFromSuperview()
         
+        // middle view
+        self.middleComplementaryLineView?.removeFromSuperview()
+        self.middleLineView?.removeFromSuperview()
+        self.middleCircle?.removeFromSuperview()
+        
+        // right view
+        self.rightComplementaryLineView?.removeFromSuperview()
+        self.rightLineView?.removeFromSuperview()
+        self.rightCircle?.removeFromSuperview()
+        
+        self.playButton.isUserInteractionEnabled = true
     }
     
     
+    func getCenterOfCircle(for view: UIView?) -> CGPoint {
+        let x = view?.frame.minX ?? 0
+        let y = view?.frame.maxY ?? 0
+        return CGPoint.init(x: x, y: y)
+    }
+    
     func animate() {
+        self.playButton.isUserInteractionEnabled = false
         
         let duration: TimeInterval = 1
-        
         let animator = UIViewPropertyAnimator(duration: duration, timingParameters: self.cubicTimingParameters)
         
         animator.addAnimations {
-            self.lineView?.transform = CGAffineTransform.init(scaleX: 1, y: 30)
+            self.middleLineView?.transform = CGAffineTransform.init(scaleX: 1, y: 30)
+            self.leftLineView?.transform = CGAffineTransform.init(scaleX: 1, y: 30)
+            self.rightLineView?.transform = CGAffineTransform.init(scaleX: 1, y: 30)
         }
-    
         animator.addCompletion { (_) in
-            let circleView = self.getCircleView()
             
+            CATransaction.begin()
+            self.animateCircle(center: self.getCenterOfCircle(for: self.middleLineView), at: 1) // 0 for left, 1 for middle and 2 fir right
+            self.animateCircle(center: self.getCenterOfCircle(for: self.leftLineView), at:  0)
+            self.animateCircle(center: self.getCenterOfCircle(for: self.rightLineView), at: 2)
             
-            self.view.bringSubviewToFront(self.complementaryLineView!)
-            self.view.bringSubviewToFront(circleView)
-            self.view.bringSubviewToFront(self.innerView!)
+            self.view.bringSubviewToFront(self.middleComplementaryLineView!)
+            self.view.bringSubviewToFront(self.middleCircle!)
+            
+            self.view.bringSubviewToFront(self.rightComplementaryLineView!)
+            self.view.bringSubviewToFront(self.rightCircle!)
+            
+            self.view.bringSubviewToFront(self.leftComplementaryLineView!)
+            self.view.bringSubviewToFront(self.leftCircle!)
+            
             let animator = UIViewPropertyAnimator(duration: 0.3, timingParameters: self.cubicTimingParameters)
-            
-            
             animator.addAnimations {
-                circleView.transform = CGAffineTransform.init(scaleX: 10, y: 10)
-                self.innerView?.transform = CGAffineTransform.init(scaleX: 10, y: 10)
-                self.complementaryLineView?.transform = CGAffineTransform.init(scaleX: 1, y: 29.8)
+                self.middleComplementaryLineView?.transform = CGAffineTransform.init(scaleX: 1, y: 29.8)
+                self.leftComplementaryLineView?.transform = CGAffineTransform.init(scaleX: 1, y: 29.8)
+                self.rightComplementaryLineView?.transform = CGAffineTransform.init(scaleX: 1, y: 29.8)
             }
-            
+            CATransaction.setCompletionBlock({
+                self.playButton.isUserInteractionEnabled = true
+            })
+            CATransaction.commit()
             animator.startAnimation()
         }
-        
         animator.startAnimation()
-
     }
     
-    func getCircleView() -> UIView {
-        let x1 = self.lineView?.frame.minX ?? 0
-        let y1 = self.lineView?.frame.maxY ?? 0
+    func animateCircle(center: CGPoint?, at position: Int) {  // 0 for left, 1 for middle and 2 for right
+        guard let center = center else {return}
+        let circularPath = UIBezierPath.init(arcCenter: center, radius: 5, startAngle: 0, endAngle: 360, clockwise: true)
+        let finalCirclePath = UIBezierPath.init(arcCenter: center, radius: 20, startAngle: 0, endAngle: 360, clockwise: true)
         
-        let center = CGPoint.init(x: x1, y: y1)
+        let circularShape = CAShapeLayer()
+        circularShape.path = circularPath.cgPath
+        circularShape.lineCap = .round
+        circularShape.lineWidth = 2
+        circularShape.strokeColor = UIColor.red.cgColor
+        circularShape.fillColor = UIColor.white.cgColor
         
-        self.circleView = UIView()
-        self.circleView?.center = center
-        self.circleView?.frame = CGRect.init(origin: center, size: CGSize.init(width: 10, height: 10))
-        self.circleView?.backgroundColor = .red
-
-        let innerView = UIView()
-        innerView.center = center
-        innerView.frame = CGRect.init(origin: center, size: CGSize.init(width: 9.7, height: 9.7))
-        self.innerView = innerView
-        innerView.backgroundColor = .white
-        innerView.layer.cornerRadius = innerView.bounds.width/2
         
-        self.circleView?.layer.cornerRadius =  (self.circleView?.bounds.width ?? 0)/2
-        self.view.addSubview(circleView!)
-        self.view.addSubview(innerView)
-        
-        return circleView ?? UIView()
+        let animation = CABasicAnimation.init(keyPath: "path")
+        animation.timingFunction = CAMediaTimingFunction.init(name: CAMediaTimingFunctionName.easeInEaseOut)
+        animation.fromValue = circularPath.cgPath
+        animation.toValue = finalCirclePath.cgPath
+        animation.duration = 0.6
+        animation.autoreverses = false
+        animation.isRemovedOnCompletion = false
+        animation.fillMode = .forwards
+        circularShape.add(animation, forKey: "path")
+        let circle = UIView()
+        circle.layer.addSublayer(circularShape)
+        switch position {
+        case 0:
+            self.leftCircle = circle
+        case 1:
+            self.middleCircle = circle
+        default:
+            self.rightCircle = circle
+        }
+        self.view.addSubview(circle)
     }
 }
 
-//
-//class CircularRing: UIView {
-//    override func draw(_ rect: CGRect) {
-//
-//        let path = UIBezierPath.init(ovalIn: rect)
-//        UIColor.white.setFill()
-//        let desiredBorderColor = UIColor.red
-//        desiredBorderColor.setStroke()
-//
-//        path.lineWidth = 1
-//        path.fill()
-//        path.stroke()
-//
-//    }
-//}
+
+
